@@ -1,0 +1,37 @@
+version: '3.8'
+services:
+  redis_master:
+    image: redis:7.0.10-alpine
+    container_name: redis_master_database
+    restart: always
+    ports:
+      - '6379:6379'
+    volumes: 
+      - redis_master_data:/data
+      - ./redis.conf:/data/usr/local/etc/redis/redis.conf
+    command: redis-server usr/local/etc/redis/redis.conf
+    networks:
+      - redis_master_slave
+
+  redis_slave:
+    image: redis:7.0.10-alpine
+    container_name: redis_slave_database
+    restart: always
+    ports:
+      - '6378:6378'
+    volumes: 
+      - redis_slave_data:/data
+      - ./redis_s1.conf:/data/usr/local/etc/redis/redis.conf
+    command: redis-server usr/local/etc/redis/redis.conf
+    networks:
+      - redis_master_slave
+
+volumes:
+  redis_master_data:
+    driver: local
+  redis_slave_data:
+    driver: local
+
+networks: 
+  redis_master_slave:
+    driver: bridge
